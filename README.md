@@ -11,35 +11,29 @@ This repository presents a statistical framework for modeling longitudinal data 
 
 The main objective is to capture nonlinear trajectories over time while accounting for subject-specific variability through random effects and correlation structures.
 
-This approach is particularly useful when the relationship between the response and time is not adequately described by linear models.
+This approach is useful when the relationship between the response variable and time cannot be adequately described by linear models.
 
 ## Statistical Problem
 
-In longitudinal studies, repeated measurements collected over time often exhibit:
-
-- Nonlinear temporal patterns  
-- Between-subject variability  
-- Within-subject correlation  
-
-Traditional linear mixed models may fail to capture these complexities. Therefore, a semiparametric approach is adopted.
+In longitudinal studies, repeated measurements collected over time often exhibit nonlinear temporal patterns, between-subject variability, and within-subject correlation. Traditional linear mixed models may fail to capture these complexities. Therefore, a semiparametric approach is adopted.
 
 ## Model Specification
 
-Let \( y_{ij} \) be the response for subject \( i \) at time \( j \).
+Let $y_{ij}$ be the response for subject $i$ at time $j$.
 
-The GAMM model is defined as:
+The GAMM model can be written as:
 
 $$
-y_{ij} = \beta_0 + \sum_{k=1}^{K} f_k(t_{ij}) + b_i + \epsilon_{ij}
+y_{ij} = \beta_0 + \sum_{k=1}^{K} f_k(t_{ij}) + b_i + \varepsilon_{ij}
 $$
 
 where:
 
-- \( f_k(\cdot) \): smooth nonparametric functions (P-splines)
-- \( b_i \sim N(0, \sigma_b^2) \): random effects (subject-specific)
-- \( \epsilon_{ij} \sim N(0, \sigma^2) \): residual error
+- $f_k(\cdot)$ represents smooth nonparametric functions estimated by P-splines
+- $b_i \sim N(0, \sigma_b^2)$ represents subject-specific random effects
+- $\varepsilon_{ij} \sim N(0, \sigma^2)$ represents the residual error
 
-The smooth functions are estimated using P-splines, defined as:
+The smooth function is represented as a linear combination of B-spline basis functions:
 
 $$
 f(t) = \sum_{m=1}^{M} \theta_m B_m(t)
@@ -48,79 +42,65 @@ $$
 with a roughness penalty:
 
 $$
-\lambda \sum (\Delta^d \theta_m)^2
+\lambda \sum_{m} \left(\Delta^d \theta_m\right)^2
 $$
 
 where:
 
-- \( B_m(t) \): B-spline basis functions  
-- \( \lambda \): smoothing parameter  
-- \( d \): order of the difference penalty  
+- $B_m(t)$ represents the B-spline basis functions
+- $\theta_m$ represents the spline coefficients
+- $\lambda$ is the smoothing parameter
+- $d$ is the order of the difference penalty
 
 This penalization controls overfitting and ensures smooth trajectories.
 
 ## Mixed Model Representation
 
-The GAMM can be rewritten in mixed model form:
+The GAMM can be represented in mixed-model form as:
 
 $$
-y = X\beta + Zb + \epsilon
+y = X\beta + Zb + \varepsilon
 $$
 
 where:
 
-- \( X \): fixed effects design matrix  
-- \( Z \): random effects design matrix  
-- \( b \sim N(0, G) \)  
-- \( \epsilon \sim N(0, R) \)  
+- $X$ is the fixed-effects design matrix
+- $Z$ is the random-effects design matrix
+- $b \sim N(0, G)$ is the vector of random effects
+- $\varepsilon \sim N(0, R)$ is the vector of residual errors
 
-This representation allows estimation using standard mixed-model frameworks (REML).
+This representation allows estimation using standard mixed-model frameworks, such as REML.
 
 ## Correlation Structures
 
-To account for temporal dependence, different covariance structures were considered:
+To account for temporal dependence, different covariance structures were evaluated:
 
-- No correlation
+- No correlation structure
 - AR(1)
-- Compound symmetry (CS)
+- Compound Symmetry (CS)
 - ARMA(1,1)
 
-Model selection was performed using Akaike Information Criterion (AIC):
+Model selection was performed using the Akaike Information Criterion:
 
 $$
 AIC = -2 \log L(\hat{\theta}) + 2p
 $$
 
-The AR(1) structure provided the best fit (lowest AIC), indicating that correlations decay with time lag. :contentReference[oaicite:0]{index=0}
+The AR(1) structure provided the best fit, indicating that correlations between repeated measurements decrease as the time lag increases.
 
 ## Model Estimation
 
-- Estimation method: Restricted Maximum Likelihood (REML)
-- Smoothing selection: Penalized likelihood
-- Implementation: R (mgcv, nlme, splines)
+The models were estimated using Restricted Maximum Likelihood (REML). The smoothing terms were estimated through penalized likelihood, and the implementation was performed in R using packages such as `mgcv`, `nlme`, and `splines`.
 
-## Key Findings (Statistical Perspective)
+## Key Findings
 
-- The temporal effect is **nonlinear**, confirming the inadequacy of linear models
-- Smooth terms were statistically significant (p < 0.001)
-- Effective degrees of freedom (e.d.f.) varied across groups, indicating different levels of complexity in trajectories
-- The inclusion of random effects improved model flexibility and fit
-- AR(1) correlation structure reduced residual dependence issues
+The temporal effect was nonlinear, confirming that a simple linear model would not adequately describe the observed trajectories. The smooth terms were statistically significant, with p-values lower than 0.001 across treatment groups.
+
+The effective degrees of freedom varied across groups, indicating different levels of complexity in the estimated trajectories. The inclusion of random effects improved model flexibility, while the AR(1) correlation structure reduced residual dependence.
 
 ## Why This Approach Matters
 
-This framework combines:
-
-- **Flexibility (nonparametric smoothing)**
-- **Interpretability (mixed models)**
-- **Statistical rigor (penalization + likelihood-based inference)**
-
-making it highly suitable for:
-
-- Longitudinal data
-- Growth curves
-- Biomedical trajectories
-- Repeated measures analysis
+This framework combines nonparametric smoothing, mixed-effects modeling, penalization, likelihood-based inference, and correlation structures. Therefore, it is particularly useful for longitudinal data, growth curves, biomedical trajectories, and repeated-measures analysis.
 
 ## Reference
 
